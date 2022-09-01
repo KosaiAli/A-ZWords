@@ -63,7 +63,6 @@ class _WordsListState extends State<WordsList> {
                               wordProvider.words[index].id,
                               wordProvider.words[index].data()['meanings'],
                               wordProvider.words[index].data()['fav']),
-                          index: index,
                         );
                       },
                       controller: _scrollcontroller),
@@ -79,7 +78,6 @@ class _WordsListState extends State<WordsList> {
                               wordProvider.words[index].id,
                               wordProvider.words[index].data()['meanings'],
                               wordProvider.words[index].data()['fav']),
-                          index: index,
                         );
                       }
                       return const Text('');

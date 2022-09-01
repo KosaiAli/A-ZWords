@@ -7,12 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class WordScreen extends StatefulWidget {
-  const WordScreen(
-      {Key? key, required this.word, required this.index, this.callBack})
+  const WordScreen({Key? key, required this.word, this.callBack})
       : super(key: key);
 
   final Word word;
-  final int index;
   final Function(bool value)? callBack;
   @override
   State<WordScreen> createState() => _WordScreenState();

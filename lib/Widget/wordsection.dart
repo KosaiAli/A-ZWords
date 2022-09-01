@@ -5,10 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class WordSection extends StatefulWidget {
-  const WordSection({Key? key, required this.word, required this.index})
-      : super(key: key);
+  const WordSection({Key? key, required this.word}) : super(key: key);
   final Word word;
-  final int index;
   @override
   State<WordSection> createState() => _WordSectionState();
 }
@@ -58,7 +56,7 @@ class _WordSectionState extends State<WordSection> {
                       borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(35),
                           topRight: Radius.circular(35))),
-                  child: WordScreen(word: widget.word, index: widget.index),
+                  child: WordScreen(word: widget.word),
                 ),
               );
             }
@@ -142,7 +140,7 @@ class _WordSectionState extends State<WordSection> {
                           ),
                         ),
                         const Spacer(),
-                        wordProvider.words[widget.index].data()['fav']
+                        widget.word.fav
                             ? Container(
                                 height: 35,
                                 width: 30,

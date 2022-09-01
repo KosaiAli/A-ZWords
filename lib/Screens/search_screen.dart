@@ -147,7 +147,6 @@ class _SearchScreenState extends State<SearchScreen> {
                                               topRight: Radius.circular(35))),
                                       child: WordScreen(
                                         word: searchedWords[index],
-                                        index: index,
                                         callBack: (value) {
                                           setState(() {
                                             searchedWords[index].fav = value;
