@@ -1,4 +1,3 @@
-
 import 'package:audioplayers/audioplayers.dart';
 import 'package:azwords/Function/word.dart';
 import 'package:azwords/Function/worddata.dart';
@@ -130,7 +129,14 @@ class _WordScreenState extends State<WordScreen> {
                                             },
                                           ),
                                         )
-                                      : null,
+                                      : ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(25),
+                                          child: Image.asset(
+                                            'Assets/Images/no-photo.png',
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
                                 ),
                               ),
                               const SizedBox(
