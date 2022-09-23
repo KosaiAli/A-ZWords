@@ -1,6 +1,8 @@
 import 'package:azwords/Function/word.dart';
 import 'package:azwords/Function/worddata.dart';
+import 'package:azwords/Screens/wordscreen.dart';
 import 'package:azwords/Widget/buttons.dart';
+import 'package:azwords/Widget/image_provider.dart';
 import 'package:azwords/bars/appbar.dart' as appbar;
 import 'package:azwords/bars/bottombar.dart';
 import 'package:azwords/bars/type_sorting_bar.dart';
@@ -11,6 +13,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import 'Screens/login_screen.dart';
 
@@ -108,6 +111,33 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
+                SlidingUpPanel(
+                  onPanelClosed: () {
+                    wordProvider.setonlineSearchedWord(null);
+                    if (!wordProvider.adding) {
+                      showModalBottomSheet(
+                        backgroundColor: const Color(0x00737373),
+                        context: context,
+                        builder: (context) => Container(
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).cardColor,
+                              borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(35),
+                                  topRight: Radius.circular(35))),
+                          child: WordScreen(
+                              word: wordProvider.deitingOrAddingWord),
+                        ),
+                      );
+                    }
+                  },
+                  minHeight: 0.0,
+                  maxHeight: MediaQuery.of(context).size.height * 0.90,
+                  controller: wordProvider.panelController,
+                  borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(25),
+                      topRight: Radius.circular(25)),
+                  panel: const ImagesProv(),
+                ),
               ],
             ),
           ),
@@ -135,34 +165,5 @@ class TextScreen extends StatelessWidget {
       );
     }
     return const Text("bla bla bla");
-  }
-}
-
-class AddPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    Paint paint = Paint()
-      ..color = const Color.fromARGB(255, 22, 151, 202)
-      ..style = PaintingStyle.fill;
-    Path path = Path()..moveTo(20, 40);
-    path.quadraticBezierTo(20, 0, 60, 0);
-    path.lineTo(size.width - 60, 0);
-    path.quadraticBezierTo(size.width - 20, 0, size.width - 20, 40);
-    path.lineTo(size.width - 20, 430);
-    path.quadraticBezierTo(size.width - 20, 470, size.width - 60, 470);
-    path.lineTo(size.width * 0.64, 470); //57
-    path.quadraticBezierTo(size.width * 0.57, 470, size.width * 0.57, 490);
-    path.quadraticBezierTo(size.width * 0.57, 515, size.width * 0.50, 518.4);
-    path.quadraticBezierTo(size.width * 0.43, 515, size.width * 0.43, 490);
-    path.quadraticBezierTo(size.width * 0.43, 470, size.width * 0.35, 470);
-    path.lineTo(60, 470);
-    path.quadraticBezierTo(20, 470, 20, 430);
-    path.close();
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
   }
 }

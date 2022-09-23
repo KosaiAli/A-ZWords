@@ -66,7 +66,7 @@ class _AppBarState extends State<AppBar> with SingleTickerProviderStateMixin {
         onWillPop: () async {
           if (wordProider.adding) {
             wordProider.setAdd(false);
-
+            setState(() {});
             return false;
           }
           final difference = DateTime.now().difference(timeBackpressed);

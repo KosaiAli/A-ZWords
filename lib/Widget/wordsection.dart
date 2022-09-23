@@ -170,7 +170,8 @@ class _WordSectionState extends State<WordSection> {
                     ),
                     Expanded(
                       child: Text(
-                        widget.word.meaning[0]['definitions'][0]['definition'],
+                        widget.word.meaning[0]['definitions'][0]['definition']
+                            .toString(),
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(color: Colors.black),
                       ),

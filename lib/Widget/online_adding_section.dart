@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:azwords/Function/worddata.dart';
 import 'package:azwords/themebuilder.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
+
+import '../Function/word.dart';
 
 class OnlineAddingSection extends StatefulWidget {
   const OnlineAddingSection({
@@ -49,20 +49,24 @@ class _AddingWordSectionState extends State<OnlineAddingSection> {
                 child: GestureDetector(
                   onTap: () {
                     focusNode.unfocus();
-                    showModalBottomSheet(
-                      backgroundColor: const Color(0x00737373),
-                      context: context,
-                      builder: (context) => Container(
-                        decoration: BoxDecoration(
-                            color: Theme.of(context).cardColor,
-                            borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(35),
-                                topRight: Radius.circular(35))),
-                        child: WordS(
-                          jsoncode: jsoncode,
+                    if (jsoncode != null) {
+                      showModalBottomSheet(
+                        backgroundColor: const Color(0x00737373),
+                        context: context,
+                        builder: (context) => Container(
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).cardColor,
+                              borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(35),
+                                  topRight: Radius.circular(35))),
+                          child: WordS(
+                            word: Word(jsoncode[0]['word'],
+                                jsoncode[0]['meanings'], false, null),
+                            jsoncode: jsoncode,
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    }
                   },
                   child: AnimatedPadding(
                     duration: const Duration(milliseconds: 500),
@@ -183,18 +187,16 @@ class _AddingWordSectionState extends State<OnlineAddingSection> {
 }
 
 class WordS extends StatefulWidget {
-  const WordS({
-    Key? key,
-    required this.jsoncode,
-  }) : super(key: key);
+  const WordS({Key? key, required this.jsoncode, required this.word})
+      : super(key: key);
 
   final dynamic jsoncode;
+  final Word word;
   @override
   State<WordS> createState() => _WordSState();
 }
 
 class _WordSState extends State<WordS> {
-  final _fireStore = FirebaseFirestore.instance;
   String def = '';
   List<dynamic> meanings = [];
   List<Widget> getdefinations(int index) {
@@ -211,17 +213,7 @@ class _WordSState extends State<WordS> {
         example = widget.jsoncode[0]['meanings'][index]['definitions'][index2]
             ['example'];
       }
-      if (example != '') {
-        def += widget.jsoncode[0]['meanings'][index]['definitions'][index2]
-                ['definition'] +
-            '|||' +
-            example +
-            '||||';
-      } else {
-        def += widget.jsoncode[0]['meanings'][index]['definitions'][index2]
-                ['definition'] +
-            '||||';
-      }
+
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 3),
         child: Column(
@@ -245,7 +237,6 @@ class _WordSState extends State<WordS> {
     return lis;
   }
 
-  final _auth = FirebaseAuth.instance;
   List<Widget> getMeanings() {
     meanings = widget.jsoncode[0]['meanings'];
 
@@ -274,77 +265,78 @@ class _WordSState extends State<WordS> {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(35), topRight: Radius.circular(35)),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 20, top: 40, right: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  widget.jsoncode[0]['word'],
-                  style: const TextStyle(
-                    fontSize: 24,
-                    color: Colors.blue,
-                    letterSpacing: 0.5,
-                    fontFamily: 'LuckiestGuy',
+    return Consumer<WordData>(builder: (context, wordProvider, child) {
+      return ClipRRect(
+        borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(35), topRight: Radius.circular(35)),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 20, top: 40, right: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    widget.jsoncode[0]['word'],
+                    style: const TextStyle(
+                      fontSize: 24,
+                      color: Colors.blue,
+                      letterSpacing: 0.5,
+                      fontFamily: 'LuckiestGuy',
+                    ),
                   ),
-                ),
-                RawMaterialButton(
-                  onPressed: () async {
-                    await _fireStore
-                        .collection('users')
-                        .doc(_auth.currentUser?.uid)
-                        .collection('words')
-                        .doc(widget.jsoncode[0]['word'])
-                        .set({'meanings': meanings, 'fav': false});
-                    // add();
-                    // widget.callback();
-                  },
-                  fillColor: Colors.blue,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(35)),
-                  constraints:
-                      const BoxConstraints.expand(height: 40, width: 40),
-                  child: Icon(Icons.add,
-                      color:
-                          ThemeBuilder.of(context)?.themeMode == ThemeMode.light
-                              ? Colors.white
-                              : Colors.black),
-                )
-              ],
+                  RawMaterialButton(
+                    onPressed: () async {
+                      Navigator.pop(context);
+                      wordProvider
+                          .setonlineSearchedWord(widget.jsoncode[0]['word']);
+                      wordProvider.panelController.open();
+                      wordProvider.setjsoncode(widget.jsoncode);
+                      wordProvider.setmeanings(meanings);
+                      
+                    },
+                    fillColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(35)),
+                    constraints:
+                        const BoxConstraints.expand(height: 40, width: 40),
+                    child: Icon(Icons.add,
+                        color: ThemeBuilder.of(context)?.themeMode ==
+                                ThemeMode.light
+                            ? Colors.white
+                            : Colors.black),
+                  )
+                ],
+              ),
             ),
-          ),
-          const SizedBox(
-            height: 4.0,
-          ),
-          Expanded(
-            child: ListView(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.only(left: 20),
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 5),
-                  child: Text(
-                    'Meaning:',
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).primaryColor,
-                        letterSpacing: 0.4),
+            const SizedBox(
+              height: 4.0,
+            ),
+            Expanded(
+              child: ListView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.only(left: 20),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 5),
+                    child: Text(
+                      'Meaning:',
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).primaryColor,
+                          letterSpacing: 0.4),
+                    ),
                   ),
-                ),
-                Column(
-                  children: getMeanings(),
-                )
-              ],
+                  Column(
+                    children: getMeanings(),
+                  )
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    });
   }
 }

@@ -17,12 +17,10 @@ class SortType extends StatelessWidget {
       onTap: () async {
         Provider.of<WordData>(context, listen: false).setdisplaySelected(index);
         if (text == 'a-z') {
-          // await Provider.of<WordData>(context, listen: false).sortAtoZ();
           Provider.of<WordData>(context, listen: false).setSelected(index);
         } else if (text == 'z-a') {
           Provider.of<WordData>(context, listen: false).setSelected(index);
         } else if (text == ' favourite') {
-          // await Provider.of<WordData>(context, listen: false).sorFavourite();
           Provider.of<WordData>(context, listen: false).setSelected(index);
         } else if (text == 'normal') {
           Provider.of<WordData>(context, listen: false).setSelected(index);

@@ -198,5 +198,4 @@ class CPainter2 extends CustomPainter {
 }
 
 
-//  } else {
       

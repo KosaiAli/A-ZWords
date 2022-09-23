@@ -16,20 +16,11 @@ class WordsList extends StatefulWidget {
 }
 
 class _WordsListState extends State<WordsList> {
-  late ScrollController _scrollcontroller;
   final _fireStore = FirebaseFirestore.instance;
   @override
   void initState() {
     super.initState();
-    _scrollcontroller = ScrollController()
-      ..addListener(() {
-        if (Provider.of<WordData>(context, listen: false).words.length > 4) {
-          Provider.of<WordData>(context, listen: false)
-              .setScrolling(_scrollcontroller.offset > 0);
-        } else {
-          Provider.of<WordData>(context, listen: false).setScrolling(false);
-        }
-      });
+    Provider.of<WordData>(context, listen: false).setListner();
   }
 
   @override
@@ -62,27 +53,31 @@ class _WordsListState extends State<WordsList> {
                           word: Word(
                               wordProvider.words[index].id,
                               wordProvider.words[index].data()['meanings'],
-                              wordProvider.words[index].data()['fav']),
+                              wordProvider.words[index].data()['fav'],
+                              wordProvider.words[index].data()['photoUrl']
+                              ),
                         );
                       },
-                      controller: _scrollcontroller),
+                      controller: wordProvider.scrollController),
                 );
               }
               return Expanded(
                 child: ListView.builder(
-                    itemCount: wordProvider.words.length,
-                    itemBuilder: (context, index) {
-                      if (wordProvider.words[index].data()['fav']) {
-                        return WordSection(
-                          word: Word(
-                              wordProvider.words[index].id,
-                              wordProvider.words[index].data()['meanings'],
-                              wordProvider.words[index].data()['fav']),
-                        );
-                      }
-                      return const Text('');
-                    },
-                    controller: _scrollcontroller),
+                  controller: wordProvider.scrollController,
+                  itemCount: wordProvider.words.length,
+                  itemBuilder: (context, index) {
+                    if (wordProvider.words[index].data()['fav']) {
+                      return WordSection(
+                        word: Word(
+                            wordProvider.words[index].id,
+                            wordProvider.words[index].data()['meanings'],
+                            wordProvider.words[index].data()['fav'],
+                            wordProvider.words[index].data()['photoUrl']),
+                      );
+                    }
+                    return Container();
+                  },
+                ),
               );
             }
             return Expanded(

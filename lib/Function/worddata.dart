@@ -2,26 +2,65 @@ import 'package:azwords/Function/word.dart';
 import 'package:flutter/material.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class WordData extends ChangeNotifier {
+  ScrollController scrollController = ScrollController();
+
   List<dynamic> words = [];
   List<String> selectedwords = [];
   List<dynamic> searchedWords = [];
+
   bool adding = false;
   bool scrolling = false;
   bool selecting = false;
   bool explinationBoxShowed = false;
   bool explinationContentShowed = false;
   bool explinationDone = false;
-  bool testing = false;
   bool connected = false;
 
   int displayselected = 1;
   int selected = 1;
   int barButtonSelected = 1;
+  late Word deitingOrAddingWord;
+  late dynamic jsoncode;
+  late List<dynamic> meanings;
+
+  String? onlineSearchedWord;
+  PanelController panelController = PanelController();
 
   late SharedPreferences sharedPreferences;
   ThemeMode themeMode = ThemeMode.light;
+
+  void setdeitingOrAddingWord(Word value) {
+    deitingOrAddingWord = value;
+    notifyListeners();
+  }
+
+  void setonlineSearchedWord(String? word) {
+    onlineSearchedWord = word;
+    notifyListeners();
+  }
+
+  void setjsoncode(dynamic value) {
+    jsoncode = value;
+    notifyListeners();
+  }
+
+  void setmeanings(List<dynamic> value) {
+    meanings = value;
+    notifyListeners();
+  }
+
+  void setListner() {
+    scrollController.addListener(() {
+      if (words.length > 4) {
+        setScrolling(scrollController.offset > 0);
+      } else {
+        setScrolling(false);
+      }
+    });
+  }
 
   Future<void> setThemeMode() async {
     sharedPreferences = await SharedPreferences.getInstance();
@@ -52,10 +91,7 @@ class WordData extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setTesting(bool value) {
-    testing = value;
-    notifyListeners();
-  }
+  
 
   void setselecting(bool b) {
     selecting = b;
@@ -129,28 +165,14 @@ class WordData extends ChangeNotifier {
     notifyListeners();
   }
 
-  // bool isFav(Word index) {
-  //   if (selected == 1) {
-  //     for (int i = 0; i < words.length; i++) {
-  //       if (index.word == words[i].word && words[i].fav) {
-  //         return true;
-  //       }
-  //     }
-  //   } else {
-  //     for (int i = 0; i < temp.length; i++) {
-  //       if (index.word == temp[i].word && temp[i].fav) return true;
-  //     }
-  //   }
-  //   return false;
-  // }
   List<Word> search(String searchWord) {
     List<String> founded = [];
     List<Word> finals = [];
     for (var element in words) {
       if (searchWord == element.id) {
         founded.add(searchWord);
-        finals.add(Word(
-            element.id, element.data()['meanings'], element.data()['fav']));
+        finals.add(Word(element.id, element.data()['meanings'],
+            element.data()['fav'], element.data()['photoUrl']));
       }
       for (int i = 0; i < searchWord.length; i++) {
         if (element.id
@@ -158,15 +180,15 @@ class WordData extends ChangeNotifier {
                 .contains(searchWord.substring(0, searchWord.length)) &&
             !founded.contains(element.id)) {
           founded.add(element.id);
-          finals.add(Word(
-              element.id, element.data()['meanings'], element.data()['fav']));
+          finals.add(Word(element.id, element.data()['meanings'],
+              element.data()['fav'], element.data()['photoUrl']));
         }
       }
       if (searchWord.characters
               .every((char) => element.id.toString().contains(char)) &&
           !founded.contains(element.id)) {
-        finals.add(Word(
-            element.id, element.data()['meanings'], element.data()['fav']));
+        finals.add(Word(element.id, element.data()['meanings'],
+            element.data()['fav'], element.data()['photoUrl']));
       }
     }
 

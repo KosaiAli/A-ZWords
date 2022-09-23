@@ -19,11 +19,7 @@ class _SearchScreenState extends State<SearchScreen> {
   late FocusNode searchFN;
   String searchingword = '';
   List<Word> searchedWords = [];
-  // Future refresWords() async {
-  //   this.searchedWords = await WordsDatabase.instance.search(searchingword);
-  //   print(searchedWords);
-  //   setState(() {});
-  // }
+
 
   @override
   void initState() {
