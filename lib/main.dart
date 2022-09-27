@@ -7,7 +7,6 @@ import 'package:azwords/bars/appbar.dart' as appbar;
 import 'package:azwords/bars/bottombar.dart';
 import 'package:azwords/bars/type_sorting_bar.dart';
 import 'package:azwords/bars/wordlist.dart';
-import 'package:azwords/theme.dart';
 import 'package:azwords/themebuilder.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -45,8 +44,19 @@ class _MainState extends State<Main> {
     return ThemeBuilder(
       builder: (context, thememode) => MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: lightThemeData(context),
-        darkTheme: darkThemeData(context),
+        theme: ThemeData(fontFamily: 'Cairo').copyWith(
+            primaryColor: Colors.black,
+            cardColor: Colors.white,
+            backgroundColor: const Color.fromARGB(255, 8, 13, 29),
+            shadowColor: Colors.white,
+            canvasColor: Colors.blue[100]),
+        darkTheme: ThemeData(fontFamily: 'Cairo').copyWith(
+          primaryColor: Colors.white,
+          scaffoldBackgroundColor: Colors.blue.shade900.withOpacity(0.1),
+          canvasColor: Colors.blue.shade200,
+          backgroundColor: const Color.fromARGB(255, 8, 10, 17),
+          cardColor: const Color.fromARGB(255, 41, 44, 58),
+        ),
         themeMode: thememode,
         home: FirebaseAuth.instance.currentUser != null
             ? const HomeScreen()
@@ -72,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                  image: const AssetImage('Assets/Images/background.jpg'),
+                  image: const AssetImage('assets/Images/background.jpg'),
                   opacity: 0.1,
                   fit: MediaQuery.of(context).size.width <
                           MediaQuery.of(context).size.height
@@ -136,7 +146,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(25),
                       topRight: Radius.circular(25)),
-                  panel: const ImagesProv(),
+                  // ignore: prefer_const_constructors
+                  panel: ImagesProv(),
                 ),
               ],
             ),

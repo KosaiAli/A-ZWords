@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 
 class Word {
-
   final String word;
   List<dynamic> meaning;
   bool fav = false;
   String? photoURL;
-  
+
   Word(this.word, this.meaning, this.fav, this.photoURL);
 
   List<Widget> getdefinations(int index) {
@@ -28,7 +27,7 @@ class Word {
               padding: const EdgeInsets.symmetric(vertical: 3),
               child: Text(
                 '${index2 + 1}- ${meaning[index]['definitions'][index2]['definition']}',
-                style: const TextStyle(fontSize: 14),
+                style: const TextStyle(height: 1.2, fontSize: 14),
               ),
             ),
             if (example != '')
@@ -55,7 +54,7 @@ class Word {
           children: [
             Text(
               '${meaning[index]['partOfSpeech']}:',
-              style: const TextStyle(fontSize: 18),
+              style: const TextStyle(height: 1.2, fontSize: 18),
             ),
             Column(
               children: getdefinations(index),

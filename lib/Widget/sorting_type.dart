@@ -46,7 +46,7 @@ class SortType extends StatelessWidget {
           children: [
             if (image != null)
               Image(
-                image: AssetImage('Assets/Images/$image.png'),
+                image: AssetImage('assets/Images/$image.png'),
                 height: 20,
                 width: 20,
               )
@@ -55,6 +55,7 @@ class SortType extends StatelessWidget {
             Text(
               text,
               style: TextStyle(
+                height: 1.2,
                 color: index == Provider.of<WordData>(context).displayselected
                     ? Colors.black
                     : Theme.of(context).textTheme.subtitle1?.color,

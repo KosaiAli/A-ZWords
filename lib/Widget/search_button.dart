@@ -19,7 +19,7 @@ class SearchBar extends StatelessWidget {
           child: Center(
             child: Container(
               height: 50,
-              width: size.width - 120,
+              width: size.width - 75,
               decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.all(
@@ -29,7 +29,7 @@ class SearchBar extends StatelessWidget {
               child: RawMaterialButton(
                 onPressed: () {
                   Navigator.push(
-                      context, FadeNavigator(page: const SearchScreen()));
+                      context, SliderNavigator(page: const SearchScreen()));
                 },
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(35),

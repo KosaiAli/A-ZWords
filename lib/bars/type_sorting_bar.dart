@@ -13,7 +13,11 @@ class SortingTypeBar extends StatelessWidget {
         padding: const EdgeInsets.only(top: 10, bottom: 5),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          height: worddata.adding || worddata.scrolling ? 0 : 30,
+          height: worddata.adding ||
+                  worddata.scrolling ||
+                  worddata.barButtonSelected == 2
+              ? 0
+              : 30,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

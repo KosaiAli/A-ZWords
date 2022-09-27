@@ -1,4 +1,5 @@
 import 'package:azwords/Function/worddata.dart';
+import 'package:azwords/Screens/login_screen.dart';
 import 'package:azwords/Widget/online_adding_section.dart';
 import 'package:azwords/Widget/search_button.dart';
 import 'package:azwords/constant.dart';
@@ -110,10 +111,20 @@ class _AppBarState extends State<AppBar> with SingleTickerProviderStateMixin {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const CircleAvatar(
-                      backgroundColor: Colors.white,
-                      maxRadius: 25,
-                      child: Icon(Icons.list, color: kPimaryColor, size: 30),
+                    GestureDetector(
+                      onTap: () async {
+                        await FirebaseAuth.instance.signOut().then((value) {
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LogInScreen()));
+                        });
+                      },
+                      child: const CircleAvatar(
+                        backgroundColor: Colors.white,
+                        maxRadius: 25,
+                        child: Icon(Icons.list, color: kPimaryColor, size: 30),
+                      ),
                     ),
                     GestureDetector(
                       onTap: () {
@@ -123,7 +134,7 @@ class _AppBarState extends State<AppBar> with SingleTickerProviderStateMixin {
                         }
                       },
                       child: Lottie.asset(
-                        'Assets/Animation/switch button.zip',
+                        'assets/Animation/switch button.zip',
                         width: 65,
                         controller: animationController,
                         fit: BoxFit.fill,
@@ -138,8 +149,9 @@ class _AppBarState extends State<AppBar> with SingleTickerProviderStateMixin {
                 child: Text(
                   'A-Z Words',
                   style: TextStyle(
-                    fontFamily: 'LuckiestGuy',
                     fontSize: 35,
+                    height: 1.2,
+                    fontWeight: FontWeight.w900,
                     color: Colors.white,
                   ),
                 ),
@@ -205,6 +217,7 @@ class LengthInfo extends StatelessWidget {
               style: TextStyle(
                   color: wordProvider.selecting ? Colors.blue : Colors.white,
                   fontSize: 16,
+                  height: 1.2,
                   fontWeight: wordProvider.selecting
                       ? FontWeight.bold
                       : FontWeight.normal),

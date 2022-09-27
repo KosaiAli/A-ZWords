@@ -20,7 +20,6 @@ class _SearchScreenState extends State<SearchScreen> {
   String searchingword = '';
   List<Word> searchedWords = [];
 
-
   @override
   void initState() {
     searchFN = FocusNode();
@@ -62,7 +61,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         textAlignVertical: TextAlignVertical.center,
                         decoration: const InputDecoration(
                           hintText: 'Write the word',
-                          contentPadding: EdgeInsets.only(bottom: 14),
+                          contentPadding: EdgeInsets.only(bottom: 7),
                           border: InputBorder.none,
                         ),
                       ),

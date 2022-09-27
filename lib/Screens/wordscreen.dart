@@ -83,19 +83,23 @@ class _WordScreenState extends State<WordScreen> {
                             children: [
                               GestureDetector(
                                 onTap: () {
-                                  Navigator.pop(context);
                                   wordProvider.panelController.open();
                                   wordProvider
                                       .setonlineSearchedWord(widget.word.word);
                                   wordProvider.setmeanings(widget.word.meaning);
                                   wordProvider
                                       .setdeitingOrAddingWord(widget.word);
+
+                                  Navigator.pop(context);
                                 },
                                 child: Container(
                                   width: 80,
                                   height: 80,
                                   decoration: BoxDecoration(
-                                    color: Colors.grey,
+                                    color: Colors.white,
+                                    border: widget.word.photoURL != null
+                                        ? null
+                                        : Border.all(),
                                     borderRadius: BorderRadius.circular(25),
                                   ),
                                   child: widget.word.photoURL != null
@@ -129,12 +133,10 @@ class _WordScreenState extends State<WordScreen> {
                                             },
                                           ),
                                         )
-                                      : ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(25),
+                                      : Padding(
+                                          padding: const EdgeInsets.all(20),
                                           child: Image.asset(
-                                            'Assets/Images/no-photo.png',
-                                            fit: BoxFit.cover,
+                                            'assets/Images/no-photo.png',
                                           ),
                                         ),
                                 ),
@@ -153,9 +155,10 @@ class _WordScreenState extends State<WordScreen> {
                                         Text(
                                           widget.word.word,
                                           style: const TextStyle(
+                                              height: 1.2,
                                               color: Colors.blue,
                                               fontSize: 28,
-                                              fontFamily: 'LuckiestGuy',
+                                              fontWeight: FontWeight.bold,
                                               letterSpacing: 0.5),
                                         ),
                                         const SizedBox(
@@ -175,7 +178,8 @@ class _WordScreenState extends State<WordScreen> {
                                   ),
                                   Text(
                                     '${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day} ${DateTime.now().hour}:${DateTime.now().minute}',
-                                    style: TextStyle(color: Colors.grey[600]),
+                                    style: TextStyle(
+                                        height: 1.2, color: Colors.grey[600]),
                                   )
                                 ],
                               ),

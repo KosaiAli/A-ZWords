@@ -10,6 +10,9 @@ class WordData extends ChangeNotifier {
   List<dynamic> words = [];
   List<String> selectedwords = [];
   List<dynamic> searchedWords = [];
+  List<Word> list = [];
+  List<int> random = [];
+  Map<int, bool> results = {};
 
   bool adding = false;
   bool scrolling = false;
@@ -22,15 +25,45 @@ class WordData extends ChangeNotifier {
   int displayselected = 1;
   int selected = 1;
   int barButtonSelected = 1;
+  int howmaynphotos = 0;
   late Word deitingOrAddingWord;
   late dynamic jsoncode;
   late List<dynamic> meanings;
 
+  late AnimationController animationController;
   String? onlineSearchedWord;
   PanelController panelController = PanelController();
 
   late SharedPreferences sharedPreferences;
   ThemeMode themeMode = ThemeMode.light;
+
+  void initAnimationController(TickerProvider vsync) {
+    animationController =
+        AnimationController(vsync: vsync, duration: const Duration(seconds: 1));
+  }
+
+  void setRaandom(List<int> value) {
+    random = value;
+    notifyListeners();
+  }
+
+  int howManyCorrect() {
+    int n = 0;
+    results.forEach((key, value) {
+      if (value == true) {
+        n++;
+      }
+    });
+    return n;
+  }
+
+  void sethowmaynphotos(int value) {
+    howmaynphotos = value;
+  }
+
+  void initList(List<Word> value) {
+    list = value;
+  }
 
   void setdeitingOrAddingWord(Word value) {
     deitingOrAddingWord = value;
@@ -90,8 +123,6 @@ class WordData extends ChangeNotifier {
     scrolling = value;
     notifyListeners();
   }
-
-  
 
   void setselecting(bool b) {
     selecting = b;

@@ -32,6 +32,7 @@ class _ImagesProvState extends State<ImagesProv> {
   @override
   Widget build(BuildContext context) {
     word = Provider.of<WordData>(context, listen: false).onlineSearchedWord;
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -63,77 +64,86 @@ class _ImagesProvState extends State<ImagesProv> {
               if (snapshot.data?.statusCode == 200) {
                 var jsoncode = jsonDecode(snapshot.data!.body);
                 List a = jsoncode['results'];
-                return Expanded(
-                  child: GridView.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2),
-                    itemCount: a.length,
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                        onTap: () async {
-                          Provider.of<WordData>(context, listen: false)
-                                  .deitingOrAddingWord
-                                  .photoURL =
-                              jsoncode['results'][index]['urls']['small'];
-                          await _fireStore
-                              .collection('users')
-                              .doc(_auth.currentUser?.uid)
-                              .collection('words')
-                              .doc(Provider.of<WordData>(context, listen: false)
-                                  .onlineSearchedWord)
-                              .set({
-                            'meanings':
-                                Provider.of<WordData>(context, listen: false)
-                                    .meanings,
-                            'fav': false,
-                            'photoUrl': jsoncode['results'][index]['urls']
-                                ['small']
-                          }).then((value) {
-                            Fluttertoast.showToast(
-                                gravity: ToastGravity.SNACKBAR,
-                                msg: 'Successfully added with an image',
-                                fontSize: 16,
-                                textColor: kPimaryColor,
-                                backgroundColor: Colors.white);
-                            Provider.of<WordData>(context, listen: false)
-                                .panelController
-                                .close();
-                          });
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
+                if (a.isNotEmpty) {
+                  return Expanded(
+                    child: GridView.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2),
+                      itemCount: a.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () async {
+                            if (!Provider.of<WordData>(context, listen: false)
+                                .adding) {
+                              Provider.of<WordData>(context, listen: false)
+                                      .deitingOrAddingWord
+                                      .photoURL =
+                                  jsoncode['results'][index]['urls']['small'];
+                            }
+                            await _fireStore
+                                .collection('users')
+                                .doc(_auth.currentUser?.uid)
+                                .collection('words')
+                                .doc(Provider.of<WordData>(context,
+                                        listen: false)
+                                    .onlineSearchedWord)
+                                .set({
+                              'meanings':
+                                  Provider.of<WordData>(context, listen: false)
+                                      .meanings,
+                              'fav': false,
+                              'photoUrl': jsoncode['results'][index]['urls']
+                                  ['small']
+                            }).then((value) {
+                              Fluttertoast.showToast(
+                                  gravity: ToastGravity.SNACKBAR,
+                                  msg: 'Successfully added with an image',
+                                  fontSize: 16,
+                                  textColor: kPimaryColor,
+                                  backgroundColor: Colors.white);
+                              Provider.of<WordData>(context, listen: false)
+                                  .panelController
+                                  .close();
+                            });
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: Colors.black.withOpacity(0.3),
+                                      offset: const Offset(0, 3),
+                                      blurRadius: 5)
+                                ]),
+                            margin: const EdgeInsets.all(8),
+                            child: ClipRRect(
                               borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Colors.black.withOpacity(0.3),
-                                    offset: const Offset(0, 3),
-                                    blurRadius: 5)
-                              ]),
-                          margin: const EdgeInsets.all(8),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: Image.network(
-                              jsoncode['results'][index]['urls']['small'],
-                              fit: BoxFit.cover,
-                              loadingBuilder:
-                                  (context, child, loadingProgress) {
-                                if (loadingProgress?.cumulativeBytesLoaded ==
-                                    loadingProgress?.expectedTotalBytes) {
-                                  return child;
-                                }
-                                return Shimmer.fromColors(
-                                  highlightColor: Colors.grey[100]!,
-                                  baseColor: Colors.grey[300]!,
-                                  child: Container(color: Colors.white),
-                                );
-                              },
+                              child: Image.network(
+                                jsoncode['results'][index]['urls']['small'],
+                                fit: BoxFit.cover,
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
+                                  if (loadingProgress?.cumulativeBytesLoaded ==
+                                      loadingProgress?.expectedTotalBytes) {
+                                    return child;
+                                  }
+                                  return Shimmer.fromColors(
+                                    highlightColor: Colors.grey[100]!,
+                                    baseColor: Colors.grey[300]!,
+                                    child: Container(color: Colors.white),
+                                  );
+                                },
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
+                        );
+                      },
+                    ),
+                  );
+                }
+                return const Center(
+                  child: Text('No result found'),
                 );
               }
               return const Center(
@@ -145,9 +155,11 @@ class _ImagesProvState extends State<ImagesProv> {
           ),
         GestureDetector(
           onTap: () async {
-            Provider.of<WordData>(context, listen: false)
-                .deitingOrAddingWord
-                .photoURL = null;
+            if (!Provider.of<WordData>(context, listen: false).adding) {
+              Provider.of<WordData>(context, listen: false)
+                  .deitingOrAddingWord
+                  .photoURL = null;
+            }
             await _fireStore
                 .collection('users')
                 .doc(_auth.currentUser?.uid)

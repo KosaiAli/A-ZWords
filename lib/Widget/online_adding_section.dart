@@ -144,7 +144,8 @@ class _AddingWordSectionState extends State<OnlineAddingSection> {
                 controller: textEditingController,
                 cursorHeight: 20,
                 textAlignVertical: TextAlignVertical.center,
-                style: const TextStyle(color: Colors.white, fontSize: 14),
+                style: const TextStyle(
+                    color: Colors.white, fontSize: 14, height: 1.2),
                 decoration: InputDecoration(
                   fillColor: Theme.of(context).backgroundColor,
                   filled: true,
@@ -279,10 +280,11 @@ class _WordSState extends State<WordS> {
                   Text(
                     widget.jsoncode[0]['word'],
                     style: const TextStyle(
-                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 28,
+                      height: 1.2,
                       color: Colors.blue,
                       letterSpacing: 0.5,
-                      fontFamily: 'LuckiestGuy',
                     ),
                   ),
                   RawMaterialButton(
@@ -293,7 +295,6 @@ class _WordSState extends State<WordS> {
                       wordProvider.panelController.open();
                       wordProvider.setjsoncode(widget.jsoncode);
                       wordProvider.setmeanings(meanings);
-                      
                     },
                     fillColor: Colors.blue,
                     shape: RoundedRectangleBorder(
@@ -323,6 +324,7 @@ class _WordSState extends State<WordS> {
                       'Meaning:',
                       style: TextStyle(
                           fontSize: 18,
+                          height: 1.2,
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).primaryColor,
                           letterSpacing: 0.4),

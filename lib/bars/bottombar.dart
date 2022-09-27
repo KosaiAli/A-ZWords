@@ -40,45 +40,47 @@ class BottomBarButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<WordData>(
-      builder: (context, wordProvider, child) => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          GestureDetector(
-            onTap: () => wordProvider.setBarButton(1),
-            child: Column(
-              children: const [
-                ButtonIcon(
-                  image: 'Assets/Images/home.png',
-                  index: 1,
-                ),
-                SizedBox(
-                  height: 3,
-                ),
-                SelectedbarButton(index: 1),
-              ],
+      builder: (context, wordProvider, child) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 40),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            GestureDetector(
+              onTap: () => wordProvider.setBarButton(1),
+              child: Column(
+                children: const [
+                  ButtonIcon(
+                    image: 'assets/Images/home.png',
+                    index: 1,
+                  ),
+                  SizedBox(
+                    height: 3,
+                  ),
+                  SelectedbarButton(index: 1),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(
-            width: 20,
-          ),
-          GestureDetector(
-            onTap: () {
-              wordProvider.setBarButton(2);
-            },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: const [
-                ButtonIcon(image: 'Assets/Images/test.png', index: 2),
-                SizedBox(
-                  height: 3,
-                ),
-                SelectedbarButton(
-                  index: 2,
-                )
-              ],
+            GestureDetector(
+              onTap: () {
+                wordProvider.setBarButton(2);
+              },
+              child: Column(
+                children: [
+                  Container(
+                      transform: Matrix4.translationValues(2, 0, 0),
+                      child: const ButtonIcon(
+                          image: 'assets/Images/test.png', index: 2)),
+                  const SizedBox(
+                    height: 3,
+                  ),
+                  const SelectedbarButton(
+                    index: 2,
+                  )
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -94,7 +96,7 @@ class ButtonIcon extends StatelessWidget {
     return Consumer<WordData>(
       builder: (context, wordProvider, child) => AnimatedScale(
         duration: const Duration(milliseconds: 300),
-        scale: wordProvider.barButtonSelected == index ? 1 : 0.9,
+        scale: wordProvider.barButtonSelected == index ? 0.9 : 0.8,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           height: 30,
@@ -188,7 +190,6 @@ class CPainter2 extends CustomPainter {
     path.quadraticBezierTo(40, 80, 40, 50);
     path.close();
     canvas.drawPath(path, paint);
-    // }
   }
 
   @override
@@ -196,6 +197,3 @@ class CPainter2 extends CustomPainter {
     return true;
   }
 }
-
-
-      

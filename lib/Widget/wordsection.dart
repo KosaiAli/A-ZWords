@@ -124,6 +124,7 @@ class _WordSectionState extends State<WordSection> {
                               Text(
                                 widget.word.word,
                                 style: const TextStyle(
+                                    height: 1.2,
                                     fontSize: 16,
                                     color: Colors.blue,
                                     fontWeight: FontWeight.bold),
@@ -165,7 +166,9 @@ class _WordSectionState extends State<WordSection> {
                       child: Text(
                         'Meaning: ',
                         style: TextStyle(
-                            fontWeight: FontWeight.w500, color: Colors.black),
+                            height: 1.2,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black),
                       ),
                     ),
                     Expanded(
@@ -173,7 +176,8 @@ class _WordSectionState extends State<WordSection> {
                         widget.word.meaning[0]['definitions'][0]['definition']
                             .toString(),
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: Colors.black),
+                        style:
+                            const TextStyle(height: 1.2, color: Colors.black),
                       ),
                     ),
                   ],
