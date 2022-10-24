@@ -69,6 +69,13 @@ class _LogInScreenState extends State<LogInScreen> {
                       } catch (e) {
                         return;
                       }
+                    } else {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          content: Text(e.message.toString()),
+                        ),
+                      );
                     }
                   }
                 },

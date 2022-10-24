@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:url_launcher/url_launcher.dart' as url_launcher;
 
 class WordScreen extends StatefulWidget {
   const WordScreen({Key? key, required this.word, this.callBack})
@@ -170,6 +171,25 @@ class _WordScreenState extends State<WordScreen> {
                                           },
                                           child: const Icon(
                                             Icons.volume_up_rounded,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 5,
+                                        ),
+                                        GestureDetector(
+                                          onTap: () async {
+                                            String uri =
+                                                'https://translate.google.com/?sl=en&tl=ar&text=${widget.word.word}&op=translate';
+                                            if (await url_launcher
+                                                .canLaunchUrl(Uri.parse(uri))) {
+                                              url_launcher
+                                                  .launchUrl(Uri.parse(uri));
+                                            }
+                                          },
+                                          child: const Icon(
+                                            Icons.translate,
+                                            size: 20,
                                             color: Colors.grey,
                                           ),
                                         ),

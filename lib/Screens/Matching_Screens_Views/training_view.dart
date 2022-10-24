@@ -1,5 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:azwords/Function/worddata.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -57,75 +59,72 @@ class _TraingningScreenState extends State<TraingningScreen> {
               ),
             ],
           ),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              width: double.infinity,
-              child: GridView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: forPhoto.length <= 4 ? 2 : 3,
-                    mainAxisSpacing: 10),
-                itemCount: forPhoto.length,
-                itemBuilder: (context, index) {
-                  if (index == 0 && !shffeled) {
-                    forPhoto.shuffle();
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: forPhoto.length <= 4 ? 2 : 3,
+                  mainAxisSpacing: 10),
+              itemCount: forPhoto.length,
+              itemBuilder: (context, index) {
+                if (index == 0 && !shffeled) {
+                  forPhoto.shuffle();
 
-                    shffeled = true;
-                  }
-                  return GestureDetector(
-                    onTap: () {
-                      if (!choosed) {
-                        setState(() {
-                          borderColor = Colors.blue;
-                          selctedPhoto = forPhoto[index];
-                        });
-                      }
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        color: Colors.grey,
-                        border: selctedPhoto == forPhoto[index]
-                            ? Border.all(
-                                color: borderColor,
-                                width: 3,
-                                strokeAlign: StrokeAlign.outside)
-                            : correctPhoto == forPhoto[index]
-                                ? Border.all(
-                                    color: Colors.green,
-                                    width: 3,
-                                    strokeAlign: StrokeAlign.outside)
-                                : null,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: Image.network(
-                          wordProvider.list[forPhoto[index]].photoURL
-                              .toString(),
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress?.cumulativeBytesLoaded ==
-                                loadingProgress?.expectedTotalBytes) {
-                              return child;
-                            }
-                            return Shimmer.fromColors(
-                              highlightColor: Colors.grey[100]!,
-                              baseColor: Colors.grey[300]!,
-                              child: Container(color: Colors.white),
-                            );
-                          },
-                        ),
+                  shffeled = true;
+                }
+                return GestureDetector(
+                  onTap: () {
+                    if (!choosed) {
+                      setState(() {
+                        borderColor = Colors.blue;
+                        selctedPhoto = forPhoto[index];
+                      });
+                    }
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
+                      border: selctedPhoto == forPhoto[index]
+                          ? Border.all(
+                              color: borderColor,
+                              width: 3,
+                              strokeAlign: StrokeAlign.outside)
+                          : correctPhoto == forPhoto[index]
+                              ? Border.all(
+                                  color: Colors.green,
+                                  width: 3,
+                                  strokeAlign: StrokeAlign.outside)
+                              : null,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Image.network(
+                        wordProvider.list[forPhoto[index]].photoURL.toString(),
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress?.cumulativeBytesLoaded ==
+                              loadingProgress?.expectedTotalBytes) {
+                            return child;
+                          }
+                          return Shimmer.fromColors(
+                            highlightColor: Colors.grey[100]!,
+                            baseColor: Colors.grey[300]!,
+                            child: Container(color: Colors.white),
+                          );
+                        },
                       ),
                     ),
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 100),
+            padding: const EdgeInsets.symmetric(vertical: 30),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -140,8 +139,8 @@ class _TraingningScreenState extends State<TraingningScreen> {
                                 .list[wordProvider.random[progress]].photoURL &&
                         correctPhoto == -1) {
                       setState(() {
-                        final result = <int, bool>{
-                          wordProvider.random[progress]: true
+                        final result = <String, bool>{
+                          '${wordProvider.random[progress]}': true
                         };
                         wordProvider.results.addEntries(result.entries);
                         correctPhoto = wordProvider.random[progress];
@@ -153,8 +152,8 @@ class _TraingningScreenState extends State<TraingningScreen> {
                                 .list[wordProvider.random[progress]].photoURL &&
                         correctPhoto == -1) {
                       setState(() {
-                        final result = <int, bool>{
-                          wordProvider.random[progress]: false
+                        final result = <String, bool>{
+                          '${wordProvider.random[progress]}': false
                         };
                         wordProvider.results.addEntries(result.entries);
 
@@ -178,7 +177,7 @@ class _TraingningScreenState extends State<TraingningScreen> {
                   height: 20,
                 ),
                 RawMaterialButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (progress < wordProvider.random.length - 1 && choosed) {
                       setState(() {
                         progress++;
@@ -189,6 +188,15 @@ class _TraingningScreenState extends State<TraingningScreen> {
                       });
                     } else if (progress == wordProvider.random.length - 1 &&
                         choosed) {
+                      await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(FirebaseAuth.instance.currentUser?.uid)
+                          .collection('Trainings')
+                          .doc('Matching')
+                          .collection('value')
+                          .doc(DateTime.now().toString())
+                          .set({'result': wordProvider.results});
+
                       widget.pageController
                           .nextPage(
                               duration: const Duration(milliseconds: 200),

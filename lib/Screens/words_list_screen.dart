@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../Function/word.dart';
-import '../Widget/wordsection.dart';
+import '../Components/wordsection.dart';
 
 class WordsListScreen extends StatelessWidget {
   const WordsListScreen({

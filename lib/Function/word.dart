@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart' as url_launcher;
 
 class Word {
   final String word;
@@ -25,9 +26,36 @@ class Word {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 3),
-              child: Text(
-                '${index2 + 1}- ${meaning[index]['definitions'][index2]['definition']}',
-                style: const TextStyle(height: 1.2, fontSize: 14),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '${index2 + 1}- ${meaning[index]['definitions'][index2]['definition']}',
+                      style: const TextStyle(height: 1.2, fontSize: 14),
+                    ),
+                  ),
+                  GestureDetector(
+                      onTap: () async {
+                        String url;
+                        if (example != '') {
+                          url =
+                              'https://translate.google.com/?sl=en&tl=ar&text=${meaning[index]['definitions'][index2]['definition']}\nexample: $example&op=translate';
+                        } else {
+                          url =
+                              'https://translate.google.com/?sl=en&tl=ar&text=${meaning[index]['definitions'][index2]['definition']}&op=translate';
+                        }
+                        if (await url_launcher.canLaunchUrl(Uri.parse(url))) {
+                          url_launcher.launchUrl(Uri.parse(url));
+                        }
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: Icon(
+                          Icons.translate,
+                          size: 20,
+                        ),
+                      ))
+                ],
               ),
             ),
             if (example != '')

@@ -53,6 +53,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       child: TextField(
                         onChanged: ((value) {
                           setState(() {
+                            searchingword = value.trim();
                             searchedWords = wordProvider.search(value.trim());
                           });
                         }),

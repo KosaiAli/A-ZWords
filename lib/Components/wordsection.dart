@@ -1,6 +1,7 @@
 import 'package:azwords/Function/word.dart';
 import 'package:azwords/Function/worddata.dart';
 import 'package:azwords/Screens/wordscreen.dart';
+import 'package:azwords/themebuilder.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -84,30 +85,18 @@ class _WordSectionState extends State<WordSection> {
                 color: wordProvider.selectedwords.contains(widget.word.word) &&
                         wordProvider.selecting
                     ? Colors.blue[200]
-                    : Colors.white,
+                    : Theme.of(context).primaryColor,
                 borderRadius: const BorderRadius.all(Radius.circular(20)),
-                boxShadow: [
-                  const BoxShadow(
-                    color: Color(0xFF132C33),
-                    blurRadius: 10,
-                    blurStyle: BlurStyle.outer,
-                  ),
-                  BoxShadow(
-                    color: Theme.of(context).shadowColor,
-                    blurRadius: 20,
-                    blurStyle: BlurStyle.outer,
-                  ),
-                  BoxShadow(
-                    color: Theme.of(context).shadowColor,
-                    blurRadius: 20,
-                    blurStyle: BlurStyle.outer,
-                  ),
-                  BoxShadow(
-                    color: Theme.of(context).shadowColor,
-                    blurRadius: 10,
-                    blurStyle: BlurStyle.outer,
-                  )
-                ]),
+                boxShadow:
+                    ThemeBuilder.of(context)!.themeMode == ThemeMode.light
+                        ? [
+                            BoxShadow(
+                              color: const Color(0xFF132C33).withOpacity(0.2),
+                              blurRadius: 10,
+                              offset: const Offset(0, 5),
+                            ),
+                          ]
+                        : null),
             child: ClipRRect(
               borderRadius: const BorderRadius.all(Radius.circular(20)),
               child: Padding(

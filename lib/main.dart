@@ -1,11 +1,11 @@
 import 'package:azwords/Function/word.dart';
 import 'package:azwords/Function/worddata.dart';
 import 'package:azwords/Screens/wordscreen.dart';
-import 'package:azwords/Widget/buttons.dart';
-import 'package:azwords/Widget/image_provider.dart';
+import 'package:azwords/Components/Buttons/buttons.dart';
+import 'package:azwords/Components/image_provider.dart';
 import 'package:azwords/bars/appbar.dart' as appbar;
 import 'package:azwords/bars/bottombar.dart';
-import 'package:azwords/bars/type_sorting_bar.dart';
+import 'package:azwords/bars/sorting_type_bar.dart';
 import 'package:azwords/bars/wordlist.dart';
 import 'package:azwords/themebuilder.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -45,13 +45,13 @@ class _MainState extends State<Main> {
       builder: (context, thememode) => MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(fontFamily: 'Cairo').copyWith(
-            primaryColor: Colors.black,
+            primaryColor: Colors.white,
             cardColor: Colors.white,
             backgroundColor: const Color.fromARGB(255, 8, 13, 29),
-            shadowColor: Colors.white,
+            shadowColor: const Color(0xFF132C33).withOpacity(0.3),
             canvasColor: Colors.blue[100]),
         darkTheme: ThemeData(fontFamily: 'Cairo').copyWith(
-          primaryColor: Colors.white,
+          primaryColor: Colors.blueGrey,
           scaffoldBackgroundColor: Colors.blue.shade900.withOpacity(0.1),
           canvasColor: Colors.blue.shade200,
           backgroundColor: const Color.fromARGB(255, 8, 10, 17),
@@ -75,6 +75,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   @override
+  void initState() {
+    Provider.of<WordData>(context, listen: false).loadImage();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Consumer<WordData>(
       builder: (context, wordProvider, child) => Scaffold(
@@ -86,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   opacity: 0.1,
                   fit: MediaQuery.of(context).size.width <
                           MediaQuery.of(context).size.height
-                      ? BoxFit.fill
+                      ? BoxFit.contain
                       : BoxFit.fitWidth),
             ),
             child: Stack(

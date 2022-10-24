@@ -1,4 +1,8 @@
+import 'package:azwords/Function/example.dart';
+import 'package:azwords/Function/statement.dart';
 import 'package:azwords/Function/word.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -6,13 +10,18 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class WordData extends ChangeNotifier {
   ScrollController scrollController = ScrollController();
+  ThemeMode themeMode = ThemeMode.light;
+  PanelController panelController = PanelController();
 
   List<dynamic> words = [];
   List<String> selectedwords = [];
   List<dynamic> searchedWords = [];
   List<Word> list = [];
+  List<Example> examples = [];
   List<int> random = [];
-  Map<int, bool> results = {};
+
+  Map<String, bool> results = {};
+  Map<String, bool> exResults = {};
 
   bool adding = false;
   bool scrolling = false;
@@ -26,20 +35,124 @@ class WordData extends ChangeNotifier {
   int selected = 1;
   int barButtonSelected = 1;
   int howmaynphotos = 0;
+
+  late Statement statement;
   late Word deitingOrAddingWord;
   late dynamic jsoncode;
   late List<dynamic> meanings;
-
   late AnimationController animationController;
-  String? onlineSearchedWord;
-  PanelController panelController = PanelController();
-
   late SharedPreferences sharedPreferences;
-  ThemeMode themeMode = ThemeMode.light;
+
+  String? onlineSearchedWord;
+  List<Node?> nodes = [];
 
   void initAnimationController(TickerProvider vsync) {
     animationController =
         AnimationController(vsync: vsync, duration: const Duration(seconds: 1));
+  }
+
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  String? imagePic;
+  void loadImage() async {
+    await _firestore
+        .collection('users')
+        .doc(_auth.currentUser?.uid)
+        .get()
+        .then((snapShot) {
+      imagePic = snapShot.data()?['profilePic'];
+      notifyListeners();
+    });
+  }
+
+  int howManyExamples() {
+    examples = [];
+    for (int i = 0; i < list.length; i++) {
+      examples.add(Example(word: list[i].word, example: []));
+      for (var e in list[i].meaning) {
+        int index = list[i].meaning.indexOf(e);
+        List<dynamic> definitions = list[i].meaning[index]['definitions'];
+        for (var def in definitions) {
+          int index2 = definitions.indexOf(def);
+          if (list[i].meaning[index]['definitions'][index2]['example'] !=
+              null) {
+            examples[i]
+                .example
+                .add(list[i].meaning[index]['definitions'][index2]['example']);
+          }
+        }
+      }
+    }
+    notifyListeners();
+    int n = 0;
+    for (var element in examples) {
+      if (element.example.isNotEmpty) {
+        n++;
+      }
+    }
+    return n;
+  }
+
+  int howmaenyex() {
+    int n = 0;
+    for (int i = 0; i < random.length; i++) {
+      n += examples[random[i]].example.length;
+    }
+    return n;
+  }
+
+  void initExamples() {
+    exResults = {};
+    nodes = [];
+    statement = Statement();
+    statement.head = Node(word: list[random[0]].word);
+    statement.temp = statement.head;
+
+    for (int i = 1; i < random.length; i++) {
+      statement.temp?.next = Node(word: list[random[i]].word);
+      statement.temp = statement.temp?.next;
+    }
+    statement.temp = statement.head;
+    for (int i = 0; i < random.length; i++) {
+      List<String> defs = [];
+      for (var e in list[random[i]].meaning) {
+        int index = list[random[i]].meaning.indexOf(e);
+        List<dynamic> definitions =
+            list[random[i]].meaning[index]['definitions'];
+
+        for (var def in definitions) {
+          int index2 = definitions.indexOf(def);
+          if (list[random[i]].meaning[index]['definitions'][index2]
+                  ['example'] !=
+              null) {
+            defs.add(list[random[i]].meaning[index]['definitions'][index2]
+                ['example']);
+          }
+        }
+      }
+      if (defs.isNotEmpty) {
+        statement.temp?.head = Sentence(sentence: defs[0]);
+        statement.temp?.temp = statement.temp?.head;
+
+        for (int j = 1; j < defs.length; j++) {
+          statement.temp?.temp?.next = Sentence(sentence: defs[j]);
+          statement.temp?.temp = statement.temp?.temp?.next;
+        }
+      }
+      statement.temp = statement.temp?.next;
+    }
+    statement.temp = statement.head;
+    while (statement.temp != null) {
+      nodes.add(statement.temp);
+      statement.temp = statement.temp?.next;
+    }
+
+    statement.temp = statement.head;
+    while (statement.temp != null) {
+      statement.temp?.temp = statement.temp?.head;
+      statement.temp = statement.temp?.next;
+    }
+    statement.temp = statement.head;
   }
 
   void setRaandom(List<int> value) {
@@ -50,6 +163,16 @@ class WordData extends ChangeNotifier {
   int howManyCorrect() {
     int n = 0;
     results.forEach((key, value) {
+      if (value == true) {
+        n++;
+      }
+    });
+    return n;
+  }
+
+  int howManyExamplesCorrect() {
+    int n = 0;
+    exResults.forEach((key, value) {
       if (value == true) {
         n++;
       }
@@ -116,7 +239,6 @@ class WordData extends ChangeNotifier {
 
   void setWords(List<dynamic> words) {
     this.words = words;
-    // Future.delayed(Duration(milliseconds: 500), () => notifyListeners());
   }
 
   void setScrolling(bool value) {
@@ -126,12 +248,6 @@ class WordData extends ChangeNotifier {
 
   void setselecting(bool b) {
     selecting = b;
-    notifyListeners();
-  }
-
-  void setFav(Word index) {
-    words[isFav2(index)].fav = !words[isFav2(index)].fav;
-    // if (selected == 4) sorFavourite();
     notifyListeners();
   }
 
@@ -150,30 +266,9 @@ class WordData extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addWord(String w, String m, DateTime d) {
-    // Word word = Word(w, m, d);
-    // words.add(word);
-    notifyListeners();
-  }
-
-  void setAdd(bool add) {
+  void setAddingValue(bool add) {
     adding = add;
     notifyListeners();
-  }
-
-  void setShowed(bool e) {
-    explinationBoxShowed = e;
-
-    notifyListeners();
-  }
-
-  void setContentShowed(bool e) {
-    explinationContentShowed = e;
-    notifyListeners();
-  }
-
-  void setExDone() {
-    explinationDone = true;
   }
 
   void addSelected(String index) {
@@ -199,6 +294,9 @@ class WordData extends ChangeNotifier {
   List<Word> search(String searchWord) {
     List<String> founded = [];
     List<Word> finals = [];
+    if (searchWord == '') {
+      return [];
+    }
     for (var element in words) {
       if (searchWord == element.id) {
         founded.add(searchWord);
@@ -224,14 +322,5 @@ class WordData extends ChangeNotifier {
     }
 
     return finals;
-  }
-
-  int isFav2(Word index) {
-    for (int i = 0; i < words.length; i++) {
-      if (index.word == words[i].word) {
-        return i;
-      }
-    }
-    return -1;
   }
 }

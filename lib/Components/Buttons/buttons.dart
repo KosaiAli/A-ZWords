@@ -97,7 +97,7 @@ class _AddButtonState extends State<AddButton> {
         child: GestureDetector(
             onTap: () async {
               if (!wordProvider.selecting) {
-                wordProvider.setAdd(true);
+                wordProvider.setAddingValue(true);
               } else {
                 wordProvider.setselecting(false);
                 for (var word in wordProvider.selectedwords) {
