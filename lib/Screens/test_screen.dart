@@ -102,7 +102,6 @@ class TestTypeCard extends StatelessWidget {
             } catch (e) {
               dateTime = null;
             }
-
             if (wordProvider.list.length >= 3) {
               if (dateTime?.month == DateTime.now().month &&
                   dateTime?.day == DateTime.now().day) {

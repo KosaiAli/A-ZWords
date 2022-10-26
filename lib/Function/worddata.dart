@@ -65,6 +65,33 @@ class WordData extends ChangeNotifier {
     });
   }
 
+  late QuerySnapshot<Map<String, dynamic>> res;
+  late QuerySnapshot<Map<String, dynamic>> res2;
+  Future<void> load() async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection('Trainings')
+        .doc('Examples')
+        .collection('value')
+        .get()
+        .then((value) {
+      res = value;
+      notifyListeners();
+    });
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection('Trainings')
+        .doc('Matching')
+        .collection('value')
+        .get()
+        .then((value) {
+      res2 = value;
+      notifyListeners();
+    });
+  }
+
   int howManyExamples() {
     examples = [];
     for (int i = 0; i < list.length; i++) {

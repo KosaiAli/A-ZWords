@@ -8,16 +8,67 @@ import 'package:azwords/bars/bottombar.dart';
 import 'package:azwords/bars/sorting_type_bar.dart';
 import 'package:azwords/bars/wordlist.dart';
 import 'package:azwords/themebuilder.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:workmanager/workmanager.dart';
 
 import 'Screens/login_screen.dart';
+import 'constant.dart';
+
+void callbackDispatcher() {
+  Workmanager().executeTask((taskName, inputData) async {
+    await Firebase.initializeApp();
+    String? lastTime;
+    DateTime? dateTime;
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser?.uid)
+          .collection('Trainings')
+          .doc('Examples')
+          .collection('value')
+          .get()
+          .then((value) => lastTime = value.docs.last.id);
+
+      dateTime = DateTime.parse(lastTime.toString());
+    } catch (e) {
+      dateTime = null;
+    }
+    if (dateTime?.month == DateTime.now().month &&
+        dateTime?.day == DateTime.now().day) {
+      return Future.value(true);
+    } else {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser?.uid)
+          .collection('Trainings')
+          .doc('Examples')
+          .collection('value')
+          .doc(DateTime.now().toString())
+          .set({'result': <String, bool>{}}).then((value) {
+        Fluttertoast.showToast(
+            gravity: ToastGravity.SNACKBAR,
+            msg: 'Data created',
+            fontSize: 16,
+            textColor: kPimaryColor,
+            backgroundColor: Colors.white);
+      });
+    }
+    return Future.value(true);
+  });
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Workmanager().initialize(callbackDispatcher);
+  await Workmanager().registerPeriodicTask('test_worker7', 'test_workerTask',
+      frequency: const Duration(minutes: 15),
+      constraints: Constraints(networkType: NetworkType.connected));
   await Firebase.initializeApp();
   runApp(
     ChangeNotifierProvider(
@@ -77,6 +128,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     Provider.of<WordData>(context, listen: false).loadImage();
+
+    Provider.of<WordData>(context, listen: false).load();
     super.initState();
   }
 
