@@ -79,7 +79,7 @@ class TestTypeCard extends StatelessWidget {
       builder: (context, wordProvider, child) {
         return GestureDetector(
           onTap: () async {
-            String? lastTime;
+            late QueryDocumentSnapshot<Map<String, dynamic>> lastTime;
             DateTime? dateTime;
             Fluttertoast.showToast(
                 gravity: ToastGravity.SNACKBAR,
@@ -96,15 +96,16 @@ class TestTypeCard extends StatelessWidget {
                   .doc(word)
                   .collection('value')
                   .get()
-                  .then((value) => lastTime = value.docs.last.id);
+                  .then((value) => lastTime = value.docs.last);
 
-              dateTime = DateTime.parse(lastTime.toString());
+              dateTime = DateTime.parse(lastTime.id.toString());
             } catch (e) {
               dateTime = null;
             }
             if (wordProvider.list.length >= 3) {
               if (dateTime?.month == DateTime.now().month &&
-                  dateTime?.day == DateTime.now().day) {
+                  dateTime?.day == DateTime.now().day &&
+                  (lastTime.data()['result'] as Map).isNotEmpty) {
                 Fluttertoast.showToast(
                     gravity: ToastGravity.SNACKBAR,
                     msg:

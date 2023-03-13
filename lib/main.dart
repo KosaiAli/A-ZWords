@@ -65,11 +65,12 @@ void callbackDispatcher() {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Workmanager().initialize(callbackDispatcher);
-  await Workmanager().registerPeriodicTask('test_worker7', 'test_workerTask',
-      frequency: const Duration(minutes: 15),
-      constraints: Constraints(networkType: NetworkType.connected));
+  // await Workmanager().initialize(callbackDispatcher);
+  // await Workmanager().registerPeriodicTask('test_worker1', 'test_workerTask',
+  //     frequency: const Duration(minutes: 15),
+  //     constraints: Constraints(networkType: NetworkType.connected));
   await Firebase.initializeApp();
+  BuildContext context;
   runApp(
     ChangeNotifierProvider(
         create: (context) => WordData(), child: const Main()),
@@ -94,24 +95,65 @@ class _MainState extends State<Main> {
   Widget build(BuildContext context) {
     return ThemeBuilder(
       builder: (context, thememode) => MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(fontFamily: 'Cairo').copyWith(
-            primaryColor: Colors.white,
-            cardColor: Colors.white,
-            backgroundColor: const Color.fromARGB(255, 8, 13, 29),
-            shadowColor: const Color(0xFF132C33).withOpacity(0.3),
-            canvasColor: Colors.blue[100]),
-        darkTheme: ThemeData(fontFamily: 'Cairo').copyWith(
-          primaryColor: Colors.blueGrey,
-          scaffoldBackgroundColor: Colors.blue.shade900.withOpacity(0.1),
-          canvasColor: Colors.blue.shade200,
-          backgroundColor: const Color.fromARGB(255, 8, 10, 17),
-          cardColor: const Color.fromARGB(255, 41, 44, 58),
-        ),
-        themeMode: thememode,
-        home: FirebaseAuth.instance.currentUser != null
-            ? const HomeScreen()
-            : const LogInScreen(),
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(fontFamily: 'Cairo').copyWith(
+              primaryColor: Colors.white,
+              cardColor: Colors.white,
+              backgroundColor: const Color.fromARGB(255, 8, 13, 29),
+              shadowColor: const Color(0xFF132C33).withOpacity(0.3),
+              canvasColor: Colors.blue[100]),
+          darkTheme: ThemeData(fontFamily: 'Cairo').copyWith(
+            primaryColor: Colors.blueGrey,
+            scaffoldBackgroundColor: Colors.blue.shade900.withOpacity(0.1),
+            canvasColor: Colors.blue.shade200,
+            backgroundColor: const Color.fromARGB(255, 8, 10, 17),
+            cardColor: const Color.fromARGB(255, 41, 44, 58),
+          ),
+          themeMode: thememode,
+          home: SplashScreen()),
+    );
+  }
+}
+
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({Key? key}) : super(key: key);
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    load();
+  }
+
+  void load() async {
+    if (FirebaseAuth.instance.currentUser != null) {
+      Provider.of<WordData>(context, listen: false).load().then((value) {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomeScreen(),
+            ));
+      });
+    } else {
+      await Future.delayed(Duration(seconds: 2));
+
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LogInScreen(),
+          ));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: Text('Loading'),
       ),
     );
   }
@@ -127,9 +169,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
-    Provider.of<WordData>(context, listen: false).loadImage();
-
-    Provider.of<WordData>(context, listen: false).load();
     super.initState();
   }
 
@@ -180,6 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
+                 
                 SlidingUpPanel(
                   onPanelClosed: () {
                     wordProvider.setonlineSearchedWord(null);

@@ -12,26 +12,36 @@ class WordSection extends StatefulWidget {
   State<WordSection> createState() => _WordSectionState();
 }
 
-class _WordSectionState extends State<WordSection> {
-  bool init = false;
+class _WordSectionState extends State<WordSection>
+    with TickerProviderStateMixin {
   bool selected = false;
+  late Animation animation;
+  late AnimationController animationController;
+
   @override
   void initState() {
-    Future.delayed(
-        const Duration(milliseconds: 50),
-        () => setState(() {
-              init = true;
-            }));
     super.initState();
+    animationController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 200));
+    animation = Tween(begin: 0.0, end: 1.0).animate(
+        CurvedAnimation(parent: animationController, curve: Curves.easeOutCirc))
+      ..addListener(() {
+        setState(() {});
+      });
+    animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<WordData>(
-      builder: (context, wordProvider, child) => AnimatedScale(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOutCirc,
-        scale: init ? 1 : 0,
+      builder: (context, wordProvider, child) => Transform.scale(
+        scale: animation.value,
         child: GestureDetector(
           onTap: () {
             if (wordProvider.selecting) {

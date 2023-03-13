@@ -197,9 +197,9 @@ class _ExampleTrainingViewState extends State<ExampleTrainingView> {
                     .collection('Trainings')
                     .doc('Examples')
                     .collection('value')
-                    .doc(DateTime.now().toString())
+                    .doc('${DateTime.now().month} - ${DateTime.now().day}')
                     .set({'result': wordProvider.exResults});
-
+                wordProvider.load();
                 widget.pageController
                     .nextPage(
                         duration: const Duration(milliseconds: 200),

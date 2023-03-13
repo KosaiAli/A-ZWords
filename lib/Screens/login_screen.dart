@@ -1,6 +1,8 @@
+import 'package:azwords/Function/worddata.dart';
 import 'package:azwords/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LogInScreen extends StatefulWidget {
   const LogInScreen({Key? key}) : super(key: key);
@@ -60,11 +62,15 @@ class _LogInScreenState extends State<LogInScreen> {
                             .createUserWithEmailAndPassword(
                                 email: _email, password: _password)
                             .then((value) {
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const HomeScreen(),
-                              ));
+                          Provider.of<WordData>(context, listen: false)
+                              .load()
+                              .then((value) {
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const HomeScreen(),
+                                ));
+                          });
                         });
                       } catch (e) {
                         return;

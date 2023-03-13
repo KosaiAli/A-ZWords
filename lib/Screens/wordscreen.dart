@@ -222,6 +222,7 @@ class _WordScreenState extends State<WordScreen> {
                                         .doc(widget.word.word)
                                         .update({'fav': !widget.word.fav}).then(
                                             (value) {
+                                      wordProvider.updateWords();
                                       setState(() {
                                         widget.word.fav = !widget.word.fav;
                                         if (widget.callBack != null) {

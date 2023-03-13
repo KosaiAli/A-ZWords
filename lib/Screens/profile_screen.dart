@@ -101,8 +101,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           radius: 35,
                           backgroundImage:
                               const AssetImage('assets/Images/user.png'),
-                          foregroundImage: wordProvider.imagePic != null
-                              ? NetworkImage(wordProvider.imagePic!)
+                          foregroundImage: wordProvider.user.profilePic != null
+                              ? NetworkImage(wordProvider.user.profilePic!)
                               : null,
                         ),
                       ),
@@ -158,7 +158,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           height: 200,
                           // color: Colors.blue,
                           child: CustomPaint(
-                              painter: WeeklyReport(list: wordProvider.res)),
+                              painter:
+                                  WeeklyReport(list: wordProvider.user.res)),
                         ),
                       ),
                       Padding(
@@ -168,7 +169,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           height: 200,
                           // color: Colors.blue,
                           child: CustomPaint(
-                              painter: WeeklyReport(list: wordProvider.res2)),
+                              painter:
+                                  WeeklyReport(list: wordProvider.user.res2)),
                         ),
                       )
                     ],

@@ -89,8 +89,8 @@ class _AppBarState extends State<AppBar> with SingleTickerProviderStateMixin {
                         radius: 22,
                         backgroundImage:
                             const AssetImage('assets/Images/user.png'),
-                        foregroundImage: wordProider.imagePic != null
-                            ? NetworkImage(wordProider.imagePic!)
+                        foregroundImage: wordProider.user.profilePic != null
+                            ? NetworkImage(wordProider.user.profilePic!)
                             : null,
                       ),
                     ),

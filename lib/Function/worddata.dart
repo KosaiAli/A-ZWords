@@ -1,6 +1,7 @@
 import 'package:azwords/Function/example.dart';
 import 'package:azwords/Function/statement.dart';
 import 'package:azwords/Function/word.dart';
+import 'package:azwords/Models/user.dart' as users;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -53,21 +54,13 @@ class WordData extends ChangeNotifier {
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  String? imagePic;
-  void loadImage() async {
-    await _firestore
-        .collection('users')
-        .doc(_auth.currentUser?.uid)
-        .get()
-        .then((snapShot) {
-      imagePic = snapShot.data()?['profilePic'];
-      notifyListeners();
-    });
-  }
 
-  late QuerySnapshot<Map<String, dynamic>> res;
-  late QuerySnapshot<Map<String, dynamic>> res2;
+  late users.User user;
   Future<void> load() async {
+    late QuerySnapshot<Map<String, dynamic>> res;
+    late QuerySnapshot<Map<String, dynamic>> res2;
+    String? imagePic;
+    late String name;
     await FirebaseFirestore.instance
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser?.uid)
@@ -77,7 +70,6 @@ class WordData extends ChangeNotifier {
         .get()
         .then((value) {
       res = value;
-      notifyListeners();
     });
     await FirebaseFirestore.instance
         .collection('users')
@@ -88,8 +80,47 @@ class WordData extends ChangeNotifier {
         .get()
         .then((value) {
       res2 = value;
-      notifyListeners();
     });
+    await _firestore
+        .collection('users')
+        .doc(_auth.currentUser?.uid)
+        .get()
+        .then((snapShot) {
+      imagePic = snapShot.data()?['profilePic'];
+    });
+    await _firestore
+        .collection('users')
+        .doc(_auth.currentUser?.uid)
+        .get()
+        .then((snapShot) {
+      name = snapShot.data()?['name'];
+    });
+    List word;
+    await _firestore
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection('words')
+        .get()
+        .then((snapshot) {
+      words = snapshot.docs.reversed.toList();
+    });
+    user = users.User(
+        name: name, res: res, res2: res2, profilePic: imagePic, words: words);
+    notifyListeners();
+  }
+
+  Future<void> updateWords() async {
+    var word;
+    await _firestore
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection('words')
+        .get()
+        .then((snapshot) {
+      words = snapshot.docs.reversed.toList();
+    });
+    user.words = words;
+    notifyListeners();
   }
 
   int howManyExamples() {

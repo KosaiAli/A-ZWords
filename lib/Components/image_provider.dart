@@ -102,6 +102,9 @@ class _ImagesProvState extends State<ImagesProv> {
                                   fontSize: 16,
                                   textColor: kPimaryColor,
                                   backgroundColor: Colors.white);
+
+                              Provider.of<WordData>(context, listen: false)
+                                  .updateWords();
                               Provider.of<WordData>(context, listen: false)
                                   .panelController
                                   .close();
@@ -172,6 +175,7 @@ class _ImagesProvState extends State<ImagesProv> {
               'fav': false,
               'photoUrl': null
             }).then((value) {
+              Provider.of<WordData>(context, listen: false).updateWords();
               Fluttertoast.showToast(
                   gravity: ToastGravity.SNACKBAR,
                   msg: 'Successfully added without an image',

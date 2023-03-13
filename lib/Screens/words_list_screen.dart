@@ -26,15 +26,16 @@ class WordsListScreen extends StatelessWidget {
               .collection('words')
               .snapshots(),
           builder: (context, snapshot) {
+            late List words;
             try {
               if (wordProvider.displayselected == 2) {
-                List reversed = snapshot.data!.docs.reversed.toList();
-                wordProvider.setWords(reversed);
+                words = wordProvider.user.words;
               } else {
-                wordProvider.setWords(snapshot.data!.docs);
+                words = wordProvider.user.words.reversed.toList();
               }
-              // ignore: empty_catches
-            } catch (e) {}
+            } catch (e) {
+              return const Text('');
+            }
             if (wordProvider.words.isNotEmpty) {
               if (wordProvider.displayselected != 3) {
                 return Expanded(
@@ -43,10 +44,10 @@ class WordsListScreen extends StatelessWidget {
                       itemBuilder: (context, index) {
                         return WordSection(
                           word: Word(
-                              wordProvider.words[index].id,
-                              wordProvider.words[index].data()['meanings'],
-                              wordProvider.words[index].data()['fav'],
-                              wordProvider.words[index].data()['photoUrl']),
+                              words[index].id,
+                              words[index].data()['meanings'],
+                              words[index].data()['fav'],
+                              words[index].data()['photoUrl']),
                         );
                       },
                       controller: wordProvider.scrollController),
@@ -57,13 +58,13 @@ class WordsListScreen extends StatelessWidget {
                   controller: wordProvider.scrollController,
                   itemCount: wordProvider.words.length,
                   itemBuilder: (context, index) {
-                    if (wordProvider.words[index].data()['fav']) {
+                    if (words[index].data()['fav']) {
                       return WordSection(
                         word: Word(
-                            wordProvider.words[index].id,
-                            wordProvider.words[index].data()['meanings'],
-                            wordProvider.words[index].data()['fav'],
-                            wordProvider.words[index].data()['photoUrl']),
+                            words[index].id,
+                            words[index].data()['meanings'],
+                            words[index].data()['fav'],
+                            words[index].data()['photoUrl']),
                       );
                     }
                     return Container();
